@@ -27,7 +27,19 @@ const useIntersectionObserver = () => {
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   useIntersectionObserver(); // For global triggers
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'glass-effect py-4 shadow-lg' : 'bg-transparent py-6'}`} style={{
@@ -39,12 +51,41 @@ const Navbar = () => {
       transition: 'all 0.3s ease'
     }}>
       <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <a href="#" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)', letterSpacing: '-1px' }}>Keshav Sahni.</a>
-        <div style={{ display: 'flex', gap: '2rem' }}>
+        <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }} onClick={closeMenu}>
+          <img src="/logo.png" alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)' }} />
+          <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Keshav Sahni.</span>
+        </a>
+
+        {/* Desktop Menu */}
+        <div className="nav-desktop" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
           {['About', 'Skills', 'Projects', 'Contact'].map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} style={{ fontWeight: 500, fontSize: '0.9rem', hover: { color: 'var(--accent)' } }}>{item}</a>
+            <a key={item} href={`#${item.toLowerCase()}`} style={{ fontWeight: 500, fontSize: '0.9rem' }} className="hover-lift">{item}</a>
           ))}
-          <a href="/Keshav-Sahni-resume.pdf" target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--accent)' }}>Resume</a>
+          <a href="/Keshav-Sahni-resume.pdf" target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--accent)' }} className="hover-lift">Resume</a>
+        </div>
+
+        {/* Hamburger Icon */}
+        <button
+          onClick={toggleMenu}
+          style={{ display: 'none', zIndex: 101, color: 'var(--text-primary)' }}
+          className="mobile-hamburger"
+          aria-label="Toggle menu"
+        >
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {isMenuOpen ? (
+              <path d="M18 6L6 18M6 6l12 12" />
+            ) : (
+              <path d="M3 12h18M3 6h18M3 18h18" />
+            )}
+          </svg>
+        </button>
+
+        {/* Mobile Menu Overlay */}
+        <div className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`}>
+          {['About', 'Skills', 'Projects', 'Contact'].map((item) => (
+            <a key={item} href={`#${item.toLowerCase()}`} onClick={closeMenu} style={{ fontSize: '1.5rem', fontWeight: 700 }}>{item}</a>
+          ))}
+          <a href="/Keshav-Sahni-resume.pdf" target="_blank" rel="noopener noreferrer" onClick={closeMenu} style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent)' }}>Resume</a>
         </div>
       </div>
     </nav>
